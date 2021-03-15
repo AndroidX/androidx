@@ -1,6 +1,9 @@
 // Signature format: 4.0
 package androidx.navigation.compose {
 
+  public final class BackStackEntryIdViewModelKt {
+  }
+
   @androidx.navigation.Navigator.Name("composable") public final class ComposeNavigator extends androidx.navigation.Navigator<androidx.navigation.compose.ComposeNavigator.Destination> {
     ctor public ComposeNavigator();
     method public androidx.navigation.compose.ComposeNavigator.Destination createDestination();

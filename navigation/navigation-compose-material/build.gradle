@@ -1,0 +1,62 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.LibraryGroups
+import androidx.build.LibraryVersions
+import androidx.build.Publish
+import androidx.build.RunApiTasks
+
+import static androidx.build.dependencies.DependenciesKt.*
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXUiPlugin")
+    id("org.jetbrains.kotlin.android")
+}
+
+dependencies {
+    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
+
+    implementation(KOTLIN_STDLIB)
+    api(projectOrArtifact(":compose:runtime:runtime"))
+    api(projectOrArtifact(":compose:runtime:runtime-saveable"))
+    api(projectOrArtifact(":navigation:navigation-common-ktx"))
+    api(projectOrArtifact(":navigation:navigation-compose"))
+    api(projectOrArtifact(":compose:foundation:foundation"))
+    api(projectOrArtifact(":compose:material:material"))
+
+    androidTestImplementation projectOrArtifact(":compose:test-utils")
+    androidTestImplementation(projectOrArtifact(":navigation:navigation-testing"))
+    androidTestImplementation(projectOrArtifact(":internal-testutils-navigation"), {
+        exclude group: "androidx.navigation", module: "navigation-common"
+    })
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
+    androidTestImplementation(ANDROIDX_TEST_RUNNER)
+    androidTestImplementation(JUNIT)
+    androidTestImplementation(TRUTH)
+}
+
+androidx {
+    name = "Compose Material Navigation"
+    publish = Publish.SNAPSHOT_AND_RELEASE
+    mavenVersion = LibraryVersions.NAVIGATION_COMPOSE_MATERIAL
+    mavenGroup = LibraryGroups.NAVIGATION
+    inceptionYear = "2021"
+    description = "Compose Material integration with Navigation"
+    runApiTasks = new RunApiTasks.Yes()
+    legacyDisableKotlinStrictApiMode = true
+}
