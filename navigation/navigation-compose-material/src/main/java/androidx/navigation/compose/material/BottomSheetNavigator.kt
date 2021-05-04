@@ -45,10 +45,10 @@ import kotlinx.coroutines.flow.StateFlow
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun rememberBottomSheetNavigator(
+public fun rememberBottomSheetNavigator(
     sheetState: ModalBottomSheetState =
         rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-) = remember(sheetState) {
+): BottomSheetNavigator = remember(sheetState) {
     BottomSheetNavigator(sheetState = sheetState)
 }
 
@@ -71,7 +71,7 @@ fun rememberBottomSheetNavigator(
 @OptIn(ExperimentalMaterialApi::class)
 @Navigator.Name("ComposeBottomSheetNavigator")
 public class BottomSheetNavigator(
-    val sheetState: ModalBottomSheetState,
+    public val sheetState: ModalBottomSheetState,
 ) : Navigator<BottomSheetNavigator.Destination>() {
 
     private var attached by mutableStateOf(false)

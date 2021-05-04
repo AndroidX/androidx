@@ -39,7 +39,7 @@ import java.util.UUID
  */
 @ExperimentalMaterialApi
 @Composable
-fun ModalBottomSheetLayout(
+public fun ModalBottomSheetLayout(
     bottomSheetNavigator: BottomSheetNavigator,
     modifier: Modifier = Modifier,
     sheetShape: Shape = MaterialTheme.shapes.large,

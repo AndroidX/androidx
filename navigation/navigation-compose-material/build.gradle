@@ -58,5 +58,4 @@ androidx {
     inceptionYear = "2021"
     description = "Compose Material integration with Navigation"
     runApiTasks = new RunApiTasks.Yes()
-    legacyDisableKotlinStrictApiMode = true
 }
