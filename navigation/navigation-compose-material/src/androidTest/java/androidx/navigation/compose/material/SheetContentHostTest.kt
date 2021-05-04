@@ -125,7 +125,4 @@ class SheetContentHostTest {
             .that(dismissedBackStackEntries)
             .containsExactly(backStackEntry)
     }
-
-
-
 }

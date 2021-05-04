@@ -36,7 +36,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -80,8 +79,10 @@ class BottomSheetNavigatorTest {
             .containsExactly(firstEntry)
 
         navigator.navigate(listOf(secondEntry), null, null)
-        assertWithMessage("The second entry has been added to the back stack and it still " +
-            "contains the first entry")
+        assertWithMessage(
+            "The second entry has been added to the back stack and it still " +
+                "contains the first entry"
+        )
             .that(navigatorState.backStack.value)
             .containsExactly(firstEntry, secondEntry)
             .inOrder()
@@ -179,5 +180,4 @@ class BottomSheetNavigatorTest {
             .that(navigatorState.backStack.value)
             .isEmpty()
     }
-
 }
