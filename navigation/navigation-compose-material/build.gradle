@@ -33,7 +33,6 @@ dependencies {
     implementation(KOTLIN_STDLIB)
     api(projectOrArtifact(":compose:runtime:runtime"))
     api(projectOrArtifact(":compose:runtime:runtime-saveable"))
-    api(projectOrArtifact(":navigation:navigation-common-ktx"))
     api(projectOrArtifact(":navigation:navigation-compose"))
     api(projectOrArtifact(":compose:foundation:foundation"))
     api(projectOrArtifact(":compose:material:material"))
