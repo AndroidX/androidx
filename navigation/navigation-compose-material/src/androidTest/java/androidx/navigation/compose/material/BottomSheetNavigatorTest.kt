@@ -56,10 +56,7 @@ class BottomSheetNavigatorTest {
         val navigatorState = TestNavigatorState()
 
         navigator.onAttach(navigatorState)
-        val destination = BottomSheetNavigator.Destination(navigator) {
-            Text("Fake Sheet Content")
-        }
-        val entry = navigatorState.createBackStackEntry(destination, null)
+        val entry = navigatorState.createBackStackEntry(navigator.createDestination(), null)
         navigator.navigate(listOf(entry), null, null)
 
         assertWithMessage("The back stack entry has been added to the back stack")
@@ -67,40 +64,27 @@ class BottomSheetNavigatorTest {
             .containsExactly(entry)
     }
 
-    @Ignore("Discussing some things around the desired behavior here, the test is broken")
     @Test
-    fun testNavigatePopsDestinationOffBackStack(): Unit = runBlocking {
+    fun testNavigateAddsDestinationToBackStackAndKeepsPrevious(): Unit = runBlocking {
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
         val navigator = BottomSheetNavigator(sheetState)
         val navigatorState = TestNavigatorState()
 
-        composeTestRule.setContent {
-            ModalBottomSheetLayout(navigator, content = {})
-        }
-
         navigator.onAttach(navigatorState)
-        val firstDestination = BottomSheetNavigator.Destination(navigator) {
-            Text("Fake Sheet Content")
-        }
-        val secondDestination = BottomSheetNavigator.Destination(navigator) {
-            Text("Fake Sheet Content")
-        }
-        val firstEntry = navigatorState.createBackStackEntry(firstDestination, null)
-        val secondEntry = navigatorState.createBackStackEntry(secondDestination, null)
+        val firstEntry = navigatorState.createBackStackEntry(navigator.createDestination(), null)
+        val secondEntry = navigatorState.createBackStackEntry(navigator.createDestination(), null)
 
         navigator.navigate(listOf(firstEntry), null, null)
-        assertWithMessage("The first back stack entry has been added to the back stack")
+        assertWithMessage("The first entry has been added to the back stack")
             .that(navigatorState.backStack.value)
             .containsExactly(firstEntry)
 
         navigator.navigate(listOf(secondEntry), null, null)
-        composeTestRule.awaitIdle()
-        assertWithMessage(
-            "The first back stack entry has been popped off the back stack and the " +
-                "second back stack entry has been added to the back stack"
-        )
+        assertWithMessage("The second entry has been added to the back stack and it still " +
+            "contains the first entry")
             .that(navigatorState.backStack.value)
-            .containsExactly(secondEntry)
+            .containsExactly(firstEntry, secondEntry)
+            .inOrder()
     }
 
     @Test
