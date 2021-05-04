@@ -15,7 +15,6 @@
  */
 
 import androidx.build.LibraryGroups
-import androidx.build.LibraryVersions
 import androidx.build.Publish
 import androidx.build.RunApiTasks
 
@@ -53,7 +52,6 @@ dependencies {
 androidx {
     name = "Compose Material Navigation"
     publish = Publish.SNAPSHOT_AND_RELEASE
-    mavenVersion = LibraryVersions.NAVIGATION_COMPOSE_MATERIAL
     mavenGroup = LibraryGroups.NAVIGATION
     inceptionYear = "2021"
     description = "Compose Material integration with Navigation"
