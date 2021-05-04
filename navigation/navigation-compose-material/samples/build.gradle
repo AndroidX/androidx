@@ -43,5 +43,5 @@ androidx {
     type = LibraryType.SAMPLES
     mavenGroup = LibraryGroups.NAVIGATION
     inceptionYear = "2021"
-    description = "Samples for Compose Material integration with Navigation"
+    description = "Samples for Navigaton integration with Compose Material"
 }

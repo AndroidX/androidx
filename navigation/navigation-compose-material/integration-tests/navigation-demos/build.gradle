@@ -40,8 +40,8 @@ dependencies {
 }
 
 androidx {
-    name = "Compose Material Navigation Demos"
+    name = "Navigation Compose Material Demos"
     publish = Publish.NONE
     inceptionYear = "2021"
-    description = "This is a project for Navigation demos."
+    description = "This is a project for demos of the navigation integration with compose material"
 }

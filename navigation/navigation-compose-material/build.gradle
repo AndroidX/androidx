@@ -50,10 +50,10 @@ dependencies {
 }
 
 androidx {
-    name = "Compose Material Navigation"
+    name = "Navigation Compose Material"
     publish = Publish.SNAPSHOT_AND_RELEASE
     mavenGroup = LibraryGroups.NAVIGATION
     inceptionYear = "2021"
-    description = "Compose Material integration with Navigation"
+    description = "Navigation integration with Compose Material"
     runApiTasks = new RunApiTasks.Yes()
 }
