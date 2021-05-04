@@ -57,9 +57,13 @@ fun rememberBottomSheetNavigator(
  * with the navigation library. Every destination using this Navigator must set a valid
  * [Composable] by setting it directly on an instantiated [Destination] or calling
  * [androidx.navigation.compose.material.bottomSheet].
- * <b>The [sheetContent] [Composable] will always host the latest entry of the back stack. Nested
- * flows inside
- * floating windows should be avoided.</b>
+ *
+ * <b>The [sheetContent] [Composable] will always host the latest entry of the back stack. When
+ * navigating from a [BottomSheetNavigator.Destination] to another
+ * [BottomSheetNavigator.Destination], the content of the sheet will be replaced instead of a
+ * new bottom sheet being shown.</b>
+ *
+ * When the sheet is dismissed by the user, the [state]'s [NavigatorState.backStack] will be popped.
  *
  * @param sheetState The [ModalBottomSheetState] that the [BottomSheetNavigator] will use to
  * drive the sheet state
