@@ -45,7 +45,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterialApi::class)
-class SheetContentHostTest {
+internal class SheetContentHostTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -56,6 +56,7 @@ class SheetContentHostTest {
         var backStackEntry by mutableStateOf<NavBackStackEntry?>(null)
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
         val navigator = BottomSheetNavigator(sheetState)
+        navigator.onAttach(navigatorState)
 
         composeTestRule.setContent {
             ModalBottomSheetLayout(
@@ -75,7 +76,7 @@ class SheetContentHostTest {
         val destination = BottomSheetNavigator.Destination(navigator) {
             Text("Fake Sheet Content")
         }
-        backStackEntry = navigatorState.createActiveBackStackEntry(destination, null)
+        backStackEntry = navigatorState.createBackStackEntry(destination, null)
 
         composeTestRule.awaitIdle()
         assertWithMessage("Bottom sheet was shown")
@@ -91,12 +92,15 @@ class SheetContentHostTest {
     @Test
     fun testOnSheetDismissedCalled_ManualDismiss(): Unit = runBlocking {
         val navigatorState = TestNavigatorState()
-        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded)
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
         val navigator = BottomSheetNavigator(sheetState)
+        navigator.onAttach(navigatorState)
+
         val destination = BottomSheetNavigator.Destination(navigator) {
             Text("Fake Sheet Content")
         }
-        val backStackEntry = navigatorState.createActiveBackStackEntry(destination, null)
+        val backStackEntry = navigatorState.createBackStackEntry(destination, null)
+        navigator.navigate(listOf(backStackEntry), null, null)
 
         val dismissedBackStackEntries = mutableListOf<NavBackStackEntry>()
         val bodyContentTag = "testBodyContent"
@@ -131,10 +135,13 @@ class SheetContentHostTest {
         val navigatorState = TestNavigatorState()
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded)
         val navigator = BottomSheetNavigator(sheetState)
+        navigator.onAttach(navigatorState)
+
         val destination = BottomSheetNavigator.Destination(navigator) {
             Text("Fake Sheet Content")
         }
-        val backStackEntry = navigatorState.createActiveBackStackEntry(destination, null)
+        val backStackEntry = navigatorState.createBackStackEntry(destination, null)
+        navigator.navigate(listOf(backStackEntry), null, null)
 
         val dismissedBackStackEntries = mutableListOf<NavBackStackEntry>()
         val bodyContentTag = "testBodyContent"

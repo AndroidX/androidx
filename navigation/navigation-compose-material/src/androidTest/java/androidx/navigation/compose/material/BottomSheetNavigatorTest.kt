@@ -43,7 +43,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalMaterialApi::class)
-class BottomSheetNavigatorTest {
+internal class BottomSheetNavigatorTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -109,7 +109,7 @@ class BottomSheetNavigatorTest {
             }
             Text("Fake Sheet Content", Modifier.testTag(firstDestinationContentTag))
         }
-        val firstEntry = navigatorState.createActiveBackStackEntry(firstDestination, null)
+        val firstEntry = navigatorState.createBackStackEntry(firstDestination, null)
 
         var secondDestinationCompositions = 0
         val secondDestinationContentTag = "secondSheetContentTest"
@@ -120,7 +120,7 @@ class BottomSheetNavigatorTest {
             }
             Box(Modifier.size(64.dp).testTag(secondDestinationContentTag))
         }
-        val secondEntry = navigatorState.createActiveBackStackEntry(secondDestination, null)
+        val secondEntry = navigatorState.createBackStackEntry(secondDestination, null)
 
         navigator.navigate(listOf(firstEntry), null, null)
         composeTestRule.awaitIdle()
@@ -162,7 +162,7 @@ class BottomSheetNavigatorTest {
         val destination = BottomSheetNavigator.Destination(navigator) {
             Text("Fake Sheet Content")
         }
-        val backStackEntry = navigatorState.createActiveBackStackEntry(destination, null)
+        val backStackEntry = navigatorState.createBackStackEntry(destination, null)
         navigator.navigate(listOf(backStackEntry), null, null)
         composeTestRule.awaitIdle()
 
