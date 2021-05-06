@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import androidx.build.AndroidXUiPlugin
 import androidx.build.LibraryGroups
 import androidx.build.Publish
 import androidx.build.RunApiTasks
@@ -25,9 +24,8 @@ plugins {
     id("AndroidXPlugin")
     id("com.android.library")
     id("AndroidXUiPlugin")
+    id("org.jetbrains.kotlin.android")
 }
-
-AndroidXUiPlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
     kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
