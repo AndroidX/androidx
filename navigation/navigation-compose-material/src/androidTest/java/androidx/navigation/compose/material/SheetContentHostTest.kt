@@ -89,7 +89,7 @@ class SheetContentHostTest {
     }
 
     @Test
-    fun testBackStackEntryDismissedAfterManualSheetDismiss(): Unit = runBlocking {
+    fun testOnSheetDismissedCalled_ManualDismiss(): Unit = runBlocking {
         val navigatorState = TestNavigatorState()
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded)
         val navigator = BottomSheetNavigator(sheetState)
@@ -119,6 +119,46 @@ class SheetContentHostTest {
         assertThat(sheetState.currentValue == ModalBottomSheetValue.Expanded)
         composeTestRule.onNodeWithTag(bodyContentTag).performClick()
         composeTestRule.awaitIdle()
+        assertWithMessage("Sheet should be hidden")
+            .that(sheetState.isVisible).isFalse()
+        assertWithMessage("Back stack entry should be in the dismissed entries list")
+            .that(dismissedBackStackEntries)
+            .containsExactly(backStackEntry)
+    }
+
+    @Test
+    fun testOnSheetDismissedCalled_programmaticDismiss(): Unit = runBlocking {
+        val navigatorState = TestNavigatorState()
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded)
+        val navigator = BottomSheetNavigator(sheetState)
+        val destination = BottomSheetNavigator.Destination(navigator) {
+            Text("Fake Sheet Content")
+        }
+        val backStackEntry = navigatorState.createActiveBackStackEntry(destination, null)
+
+        val dismissedBackStackEntries = mutableListOf<NavBackStackEntry>()
+        val bodyContentTag = "testBodyContent"
+
+        composeTestRule.setContent {
+            ModalBottomSheetLayout(
+                sheetContent = {
+                    SheetContentHost(
+                        columnHost = this,
+                        backStackEntry,
+                        sheetState,
+                        onSheetDismissed = { entry -> dismissedBackStackEntries.add(entry) }
+                    )
+                },
+                sheetState = sheetState,
+                content = { Box(Modifier.fillMaxSize().testTag(bodyContentTag)) }
+            )
+        }
+
+        assertThat(sheetState.currentValue == ModalBottomSheetValue.Expanded)
+
+        sheetState.hide()
+        composeTestRule.awaitIdle()
+
         assertWithMessage("Sheet should be hidden")
             .that(sheetState.isVisible).isFalse()
         assertWithMessage("Back stack entry should be in the dismissed entries list")
