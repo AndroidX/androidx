@@ -29,7 +29,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.material.ModalBottomSheetLayout
 import androidx.navigation.compose.material.bottomSheet
 import androidx.navigation.compose.material.rememberBottomSheetNavigator
-import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.plusAssign
 import java.util.UUID
