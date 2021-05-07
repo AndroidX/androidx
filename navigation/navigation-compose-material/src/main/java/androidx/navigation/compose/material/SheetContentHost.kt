@@ -23,19 +23,15 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.compose.runtime.saveable.SaveableStateHolder
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.compose.SaveableStateProvider
+import androidx.navigation.compose.LocalOwnersProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -65,6 +61,7 @@ internal fun SheetContentHost(
     columnHost: ColumnScope,
     backStackEntry: NavBackStackEntry?,
     sheetState: ModalBottomSheetState,
+    saveableStateHolder: SaveableStateHolder,
     onSheetDismissed: (entry: NavBackStackEntry) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -89,16 +86,9 @@ internal fun SheetContentHost(
             onDispose { scope.launch { sheetState.internalHide() } }
         }
 
-        val saveableStateHolder = rememberSaveableStateHolder()
         val content = (backStackEntry.destination as BottomSheetNavigator.Destination).content
-        CompositionLocalProvider(
-            LocalViewModelStoreOwner provides backStackEntry,
-            LocalLifecycleOwner provides backStackEntry,
-            LocalSavedStateRegistryOwner provides backStackEntry
-        ) {
-            saveableStateHolder.SaveableStateProvider {
-                columnHost.content(backStackEntry)
-            }
+        backStackEntry.LocalOwnersProvider(saveableStateHolder) {
+            columnHost.content(backStackEntry)
         }
     } else {
         EmptySheet()

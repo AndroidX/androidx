@@ -4,7 +4,7 @@ package androidx.navigation.compose.material {
   public final class BottomSheetKt {
   }
 
-  @androidx.navigation.Navigator.Name("ComposeBottomSheetNavigator") public final class BottomSheetNavigator extends androidx.navigation.Navigator<androidx.navigation.compose.material.BottomSheetNavigator.Destination> {
+  @androidx.navigation.Navigator.Name("BottomSheetNavigator") public final class BottomSheetNavigator extends androidx.navigation.Navigator<androidx.navigation.compose.material.BottomSheetNavigator.Destination> {
     ctor public BottomSheetNavigator(androidx.compose.material.ModalBottomSheetState sheetState);
     method public androidx.navigation.compose.material.BottomSheetNavigator.Destination createDestination();
     method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> getSheetContent();

@@ -5,7 +5,7 @@ package androidx.navigation.compose.material {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void ModalBottomSheetLayout--FfzBck(androidx.navigation.compose.material.BottomSheetNavigator bottomSheetNavigator, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape sheetShape, optional float sheetElevation, optional long sheetBackgroundColor, optional long sheetContentColor, optional long scrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
-  @androidx.navigation.Navigator.Name("ComposeBottomSheetNavigator") public final class BottomSheetNavigator extends androidx.navigation.Navigator<androidx.navigation.compose.material.BottomSheetNavigator.Destination> {
+  @androidx.navigation.Navigator.Name("BottomSheetNavigator") public final class BottomSheetNavigator extends androidx.navigation.Navigator<androidx.navigation.compose.material.BottomSheetNavigator.Destination> {
     ctor public BottomSheetNavigator(androidx.compose.material.ModalBottomSheetState sheetState);
     method public androidx.navigation.compose.material.BottomSheetNavigator.Destination createDestination();
     method public kotlin.jvm.functions.Function1<androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> getSheetContent();

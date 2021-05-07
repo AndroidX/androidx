@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.FloatingWindow
@@ -95,6 +96,7 @@ public class BottomSheetNavigator(
      */
     public val sheetContent: @Composable ColumnScope.() -> Unit = @Composable {
         val columnScope = this
+        val saveableStateHolder = rememberSaveableStateHolder()
         val backStackEntries by backStack.collectAsState()
         // We always replace the sheet's content instead of overlaying and nesting floating
         // window destinations. That means that only *one* concurrent destination is supported by
@@ -108,6 +110,7 @@ public class BottomSheetNavigator(
             columnHost = columnScope,
             backStackEntry = latestEntry,
             sheetState = sheetState,
+            saveableStateHolder = saveableStateHolder,
             onSheetDismissed = { entry -> state.pop(entry, saveState = false) }
         )
     }
