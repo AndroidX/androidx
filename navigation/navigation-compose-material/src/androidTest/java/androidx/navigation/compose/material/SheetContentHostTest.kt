@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
@@ -37,26 +38,30 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalCoroutinesApi::class)
 internal class SheetContentHostTest {
+
+    private val testDispatcher = TestCoroutineDispatcher()
+    private val testClock = TestMonotonicFrameClock(CoroutineScope(testDispatcher))
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
     @Test
-    fun testSheetShownAndHidden() = runBlocking {
-        val navigatorState = TestNavigatorState()
+    fun testSheetShownAndHidden() = runBlockingTest {
         var backStackEntry by mutableStateOf<NavBackStackEntry?>(null)
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
-        val navigator = BottomSheetNavigator(sheetState)
-        navigator.onAttach(navigatorState)
 
         composeTestRule.setContent {
             ModalBottomSheetLayout(
@@ -73,34 +78,23 @@ internal class SheetContentHostTest {
             )
         }
 
-        val destination = BottomSheetNavigator.Destination(navigator) {
-            Text("Fake Sheet Content")
+        backStackEntry = createBackStackEntry(sheetState)
+        composeTestRule.runOnIdle {
+            assertWithMessage("Bottom sheet was shown")
+                .that(sheetState.isVisible).isTrue()
         }
-        backStackEntry = navigatorState.createBackStackEntry(destination, null)
-
-        composeTestRule.awaitIdle()
-        assertWithMessage("Bottom sheet was shown")
-            .that(sheetState.isVisible).isTrue()
 
         backStackEntry = null
-        composeTestRule.awaitIdle()
-
-        assertWithMessage("Bottom sheet was hidden")
-            .that(sheetState.isVisible).isFalse()
+        composeTestRule.runOnIdle {
+            assertWithMessage("Bottom sheet was hidden")
+                .that(sheetState.isVisible).isFalse()
+        }
     }
 
     @Test
-    fun testOnSheetDismissedCalled_ManualDismiss(): Unit = runBlocking {
-        val navigatorState = TestNavigatorState()
+    fun testOnSheetDismissedCalled_ManualDismiss(): Unit = runBlockingTest(testClock) {
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
-        val navigator = BottomSheetNavigator(sheetState)
-        navigator.onAttach(navigatorState)
-
-        val destination = BottomSheetNavigator.Destination(navigator) {
-            Text("Fake Sheet Content")
-        }
-        val backStackEntry = navigatorState.createBackStackEntry(destination, null)
-        navigator.navigate(listOf(backStackEntry), null, null)
+        val backStackEntry = createBackStackEntry(sheetState)
 
         val dismissedBackStackEntries = mutableListOf<NavBackStackEntry>()
         val bodyContentTag = "testBodyContent"
@@ -122,26 +116,19 @@ internal class SheetContentHostTest {
 
         assertThat(sheetState.currentValue == ModalBottomSheetValue.Expanded)
         composeTestRule.onNodeWithTag(bodyContentTag).performClick()
-        composeTestRule.awaitIdle()
-        assertWithMessage("Sheet should be hidden")
-            .that(sheetState.isVisible).isFalse()
-        assertWithMessage("Back stack entry should be in the dismissed entries list")
-            .that(dismissedBackStackEntries)
-            .containsExactly(backStackEntry)
+        composeTestRule.runOnIdle {
+            assertWithMessage("Sheet should be hidden")
+                .that(sheetState.isVisible).isFalse()
+            assertWithMessage("Back stack entry should be in the dismissed entries list")
+                .that(dismissedBackStackEntries)
+                .containsExactly(backStackEntry)
+        }
     }
 
     @Test
-    fun testOnSheetDismissedCalled_programmaticDismiss(): Unit = runBlocking {
-        val navigatorState = TestNavigatorState()
-        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded)
-        val navigator = BottomSheetNavigator(sheetState)
-        navigator.onAttach(navigatorState)
-
-        val destination = BottomSheetNavigator.Destination(navigator) {
-            Text("Fake Sheet Content")
-        }
-        val backStackEntry = navigatorState.createBackStackEntry(destination, null)
-        navigator.navigate(listOf(backStackEntry), null, null)
+    fun testOnSheetDismissedCalled_programmaticDismiss(): Unit = runBlockingTest(testClock) {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
+        val backStackEntry = createBackStackEntry(sheetState)
 
         val dismissedBackStackEntries = mutableListOf<NavBackStackEntry>()
         val bodyContentTag = "testBodyContent"
@@ -163,13 +150,27 @@ internal class SheetContentHostTest {
 
         assertThat(sheetState.currentValue == ModalBottomSheetValue.Expanded)
 
-        sheetState.hide()
-        composeTestRule.awaitIdle()
+        testDispatcher.pauseDispatcher {
+            launch { sheetState.hide() }
+        }
 
-        assertWithMessage("Sheet should be hidden")
+        assertWithMessage("Sheet is visible")
             .that(sheetState.isVisible).isFalse()
         assertWithMessage("Back stack entry should be in the dismissed entries list")
             .that(dismissedBackStackEntries)
             .containsExactly(backStackEntry)
+    }
+
+    private fun createBackStackEntry(sheetState: ModalBottomSheetState): NavBackStackEntry {
+        val navigatorState = TestNavigatorState()
+        val navigator = BottomSheetNavigator(sheetState)
+        navigator.onAttach(navigatorState)
+
+        val destination = BottomSheetNavigator.Destination(navigator) {
+            Text("Fake Sheet Content")
+        }
+        val backStackEntry = navigatorState.createBackStackEntry(destination, null)
+        navigator.navigate(listOf(backStackEntry), null, null)
+        return backStackEntry
     }
 }
