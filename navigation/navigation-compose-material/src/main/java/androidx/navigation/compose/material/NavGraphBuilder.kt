@@ -21,10 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.KEY_ROUTE
 import androidx.navigation.compose.NamedNavArgument
-import androidx.navigation.compose.createRoute
-import androidx.navigation.compose.navArgument
 import androidx.navigation.get
 
 /**
@@ -46,11 +43,7 @@ public fun NavGraphBuilder.bottomSheet(
             provider[BottomSheetNavigator::class],
             content
         ).apply {
-            val internalRoute = createRoute(route)
-            addDeepLink(internalRoute)
-            val argument = navArgument(KEY_ROUTE) { defaultValue = route }
-            addArgument(argument.component1(), argument.component2())
-            id = internalRoute.hashCode()
+            this.route = route
             arguments.forEach { (argumentName, argument) ->
                 addArgument(argumentName, argument)
             }
