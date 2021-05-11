@@ -88,7 +88,7 @@ internal class SheetContentHostTest {
     }
 
     @Test
-    fun testOnSheetDismissedCalled_ManualDismiss(): Unit = runBlockingTest(testClock) {
+    fun testOnSheetDismissedCalled_ManualDismiss() = runBlockingTest(testClock) {
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
         val backStackEntry = createBackStackEntry(sheetState)
 
@@ -103,7 +103,7 @@ internal class SheetContentHostTest {
         assertThat(sheetState.currentValue == ModalBottomSheetValue.Expanded)
         composeTestRule.onNodeWithTag(bodyContentTag).performClick()
         composeTestRule.runOnIdle {
-            assertWithMessage("Sheet should be hidden")
+            assertWithMessage("Sheet is visible")
                 .that(sheetState.isVisible).isFalse()
             assertWithMessage("Back stack entry should be in the dismissed entries list")
                 .that(dismissedBackStackEntries)
@@ -135,6 +135,30 @@ internal class SheetContentHostTest {
         assertWithMessage("Back stack entry should be in the dismissed entries list")
             .that(dismissedBackStackEntries)
             .containsExactly(backStackEntry)
+    }
+
+    @Test
+    fun testOnSheetDismissedCalled_initiallyExpanded() = runBlockingTest(testClock) {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Expanded)
+        val backStackEntry = createBackStackEntry(sheetState)
+
+        val dismissedBackStackEntries = mutableListOf<NavBackStackEntry>()
+
+        composeTestRule.setBottomSheetContent(
+            mutableStateOf(backStackEntry),
+            sheetState,
+            onSheetDismissed = { entry -> dismissedBackStackEntries.add(entry) }
+        )
+
+        assertThat(sheetState.currentValue == ModalBottomSheetValue.Expanded)
+        composeTestRule.onNodeWithTag(bodyContentTag).performClick()
+        composeTestRule.runOnIdle {
+            assertWithMessage("Sheet is visible")
+                .that(sheetState.isVisible).isFalse()
+            assertWithMessage("Back stack entry should be in the dismissed entries list")
+                .that(dismissedBackStackEntries)
+                .containsExactly(backStackEntry)
+        }
     }
 
     private fun ComposeContentTestRule.setBottomSheetContent(
