@@ -186,7 +186,7 @@ internal class SheetContentHostTest {
 
     private fun createBackStackEntry(sheetState: ModalBottomSheetState): NavBackStackEntry {
         val navigatorState = TestNavigatorState()
-        val navigator = BottomSheetNavigator(sheetState)
+        val navigator = BottomSheetNavigator(sheetState, onSheetDismissed = {})
         navigator.onAttach(navigatorState)
 
         val destination = BottomSheetNavigator.Destination(navigator) {

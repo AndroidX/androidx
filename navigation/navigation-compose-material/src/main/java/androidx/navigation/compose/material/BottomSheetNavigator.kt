@@ -31,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.FloatingWindow
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigator
 import androidx.navigation.NavigatorState
@@ -43,14 +44,17 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * @param sheetState The [ModalBottomSheetState] that the [BottomSheetNavigator] will use to
  * drive the sheet state
+ * @param navController The [NavController] used to the pop the back stack when the sheet is
+ * dismissed. Please note that this will be redundant in the next release.
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 public fun rememberBottomSheetNavigator(
     sheetState: ModalBottomSheetState =
         rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-): BottomSheetNavigator = remember(sheetState) {
-    BottomSheetNavigator(sheetState = sheetState)
+    navController: NavController
+): BottomSheetNavigator = remember(sheetState, navController) {
+    BottomSheetNavigator(sheetState = sheetState, onSheetDismissed = { navController.popBackStack() })
 }
 
 /**
@@ -68,11 +72,18 @@ public fun rememberBottomSheetNavigator(
  *
  * @param sheetState The [ModalBottomSheetState] that the [BottomSheetNavigator] will use to
  * drive the sheet state
+ * @param onSheetDismissed Callback when the sheet has been dismissed. The back stack should be
+ * popped inclusively up to the [NavBackStackEntry] param. This will be done through this
+ * navigator's [NavigatorState]
+ * in
+ * the future and
+ * this parameter will be redundant.
  */
 @OptIn(ExperimentalMaterialApi::class)
 @Navigator.Name("BottomSheetNavigator")
 public class BottomSheetNavigator(
     public val sheetState: ModalBottomSheetState,
+    private val onSheetDismissed: (entry: NavBackStackEntry) -> Unit,
 ) : Navigator<BottomSheetNavigator.Destination>() {
 
     private var attached by mutableStateOf(false)
@@ -111,7 +122,13 @@ public class BottomSheetNavigator(
             backStackEntry = latestEntry,
             sheetState = sheetState,
             saveableStateHolder = saveableStateHolder,
-            onSheetDismissed = { entry -> state.pop(entry, saveState = false) }
+            onSheetDismissed = { entry ->
+                onSheetDismissed(entry)
+                // NavigatorState's pop currently can't be called outside of popBackStack so we
+                // are relying on the onSheetDismissed callback to do that work for us!
+                // b/187873799
+                //state.pop(entry, saveState = false)
+            }
         )
     }
 

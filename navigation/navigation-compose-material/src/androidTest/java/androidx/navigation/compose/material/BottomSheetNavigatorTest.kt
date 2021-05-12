@@ -51,8 +51,8 @@ internal class BottomSheetNavigatorTest {
     @Test
     fun testNavigateAddsDestinationToBackStack(): Unit = runBlocking {
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
-        val navigator = BottomSheetNavigator(sheetState)
         val navigatorState = TestNavigatorState()
+        val navigator = BottomSheetNavigator(sheetState, onSheetDismissed = { })
 
         navigator.onAttach(navigatorState)
         val entry = navigatorState.createBackStackEntry(navigator.createDestination(), null)
@@ -66,7 +66,7 @@ internal class BottomSheetNavigatorTest {
     @Test
     fun testNavigateAddsDestinationToBackStackAndKeepsPrevious(): Unit = runBlocking {
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
-        val navigator = BottomSheetNavigator(sheetState)
+        val navigator = BottomSheetNavigator(sheetState, onSheetDismissed = { })
         val navigatorState = TestNavigatorState()
 
         navigator.onAttach(navigatorState)
@@ -91,7 +91,7 @@ internal class BottomSheetNavigatorTest {
     @Test
     fun testNavigateComposesDestinationAndDisposesPreviousDestination(): Unit = runBlocking {
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
-        val navigator = BottomSheetNavigator(sheetState)
+        val navigator = BottomSheetNavigator(sheetState, onSheetDismissed = { })
         val navigatorState = TestNavigatorState()
 
         composeTestRule.setContent {
@@ -147,7 +147,12 @@ internal class BottomSheetNavigatorTest {
     fun testBackStackEntryPoppedAfterManualSheetDismiss(): Unit = runBlocking {
         val navigatorState = TestNavigatorState()
         val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
-        val navigator = BottomSheetNavigator(sheetState)
+        val navigator = BottomSheetNavigator(
+            sheetState = sheetState,
+            onSheetDismissed = { dismissedEntry ->
+                navigatorState.pop(dismissedEntry, saveState = false)
+            }
+        )
         navigator.onAttach(navigatorState)
 
         val bodyContentTag = "testBodyContent"
