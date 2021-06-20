@@ -77,8 +77,11 @@ fun stringArgument(
     .setDefaultValue(defaultValue)
     .build()
 
-fun nullableStringArgument() = NavArgument.Builder().setType(StringType)
+fun nullableStringArgument(
+    defaultValue: String?
+) = NavArgument.Builder().setType(StringType)
     .setIsNullable(true)
+    .setDefaultValue(defaultValue)
     .build()
 // endregion
 

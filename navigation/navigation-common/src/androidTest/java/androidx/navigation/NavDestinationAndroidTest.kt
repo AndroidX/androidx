@@ -21,6 +21,7 @@ import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.navigation.NavDestination.Companion.createRoute
 import androidx.navigation.test.intArgument
+import androidx.navigation.test.nullableStringArgument
 import androidx.navigation.test.stringArgument
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -109,7 +110,7 @@ class NavDestinationAndroidTest {
 
         destination.addDeepLink("www.example.com/users/index.html")
 
-        destination.addArgument("id", stringArgument())
+        destination.addArgument("name", stringArgument("no-name"))
         destination.addDeepLink("www.example.com/users/{name}")
 
         val match = destination.matchDeepLink(
@@ -192,7 +193,7 @@ class NavDestinationAndroidTest {
     fun matchDeepLinkBestMimeType() {
         val destination = NoOpNavigator().createDestination()
 
-        destination.addArgument("deeplink1", stringArgument())
+        destination.addArgument("deeplink1", nullableStringArgument(null))
         destination.addDeepLink(
             NavDeepLink(
                 "www.example.com/users/{deeplink1}",
@@ -200,7 +201,7 @@ class NavDestinationAndroidTest {
             )
         )
 
-        destination.addArgument("deeplink2", stringArgument())
+        destination.addArgument("deeplink2", nullableStringArgument(null))
         destination.addDeepLink(
             NavDeepLink(
                 "www.example.com/users/{deeplink2}",
