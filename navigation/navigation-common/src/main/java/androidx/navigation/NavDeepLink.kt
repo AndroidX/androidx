@@ -192,6 +192,13 @@ public class NavDeepLink internal constructor(
                 }
             }
         }
+
+        // Check that all required arguments are present in bundle
+        for ((argName, argument) in arguments.entries) {
+            val argumentIsRequired = argument != null && !argument.isDefaultValuePresent
+            if (argumentIsRequired && !bundle.containsKey(argName)) return null
+        }
+
         return bundle
     }
 
@@ -268,7 +275,8 @@ public class NavDeepLink internal constructor(
     public class Builder {
 
         /** @suppress */
-        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) public constructor()
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        public constructor()
 
         private var uriPattern: String? = null
         private var action: String? = null

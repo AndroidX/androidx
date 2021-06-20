@@ -1101,7 +1101,43 @@ class NavDeepLinkTest {
             mapOf("param" to intArgument(0))
         )
 
-        assertWithMessage("Args should be not be null")
+        assertWithMessage("Args should not be null")
+            .that(matchArgs)
+            .isNotNull()
+        assertWithMessage("Args bundle should be empty")
+            .that(matchArgs?.isEmpty)
+            .isTrue()
+    }
+
+    @Test
+    fun deepLinkMissingRequiredArgument() {
+        val deepLinkString = "$DEEP_LINK_EXACT_HTTPS/greeting?title={title}&text={text}"
+        val deepLink = NavDeepLink(deepLinkString)
+
+        val matchArgs = deepLink.getMatchingArguments(
+            Uri.parse("$DEEP_LINK_EXACT_HTTPS/greeting?title=No%20text"),
+            mapOf(
+                "title" to stringArgument(),
+                "text" to stringArgument()
+            )
+        )
+
+        assertWithMessage("Args should be null")
+            .that(matchArgs)
+            .isNull()
+    }
+
+    @Test
+    fun deepLinkMissingOptionalArgument() {
+        val deepLinkString = "$DEEP_LINK_EXACT_HTTPS/greeting?text={text}"
+        val deepLink = NavDeepLink(deepLinkString)
+
+        val matchArgs = deepLink.getMatchingArguments(
+            Uri.parse("$DEEP_LINK_EXACT_HTTPS/greeting"),
+            mapOf("text" to stringArgument("Default greeting"))
+        )
+
+        assertWithMessage("Args should not be null")
             .that(matchArgs)
             .isNotNull()
         assertWithMessage("Args bundle should be empty")
