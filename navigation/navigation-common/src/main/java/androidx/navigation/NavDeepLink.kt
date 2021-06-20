@@ -47,7 +47,7 @@ public class NavDeepLink internal constructor(
      */
     public val mimeType: String?
 ) {
-    private val arguments = mutableListOf<String>()
+    internal val arguments = mutableListOf<String>()
     private val paramArgMap = mutableMapOf<String, ParamQuery>()
     private var pattern: Pattern? = null
     private var isParameterizedQuery = false

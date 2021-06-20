@@ -250,9 +250,8 @@ class NavDestinationAndroidTest {
         val destination = NoOpNavigator().createDestination()
         destination.addArgument("testString", stringArgument())
         destination.addDeepLink("android-app://androidx.navigation.test/{testString}")
-        val deepLink = Uri.parse("android-app://androidx.navigation.test/test")
-        destination.addDeepLink(deepLink.toString())
 
+        val deepLink = Uri.parse("android-app://androidx.navigation.test/test")
         assertWithMessage("Deep link should match")
             .that(destination.hasDeepLink(deepLink)).isTrue()
     }
