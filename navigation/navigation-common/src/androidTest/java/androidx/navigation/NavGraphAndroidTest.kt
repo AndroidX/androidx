@@ -17,6 +17,7 @@
 package androidx.navigation
 
 import android.net.Uri
+import androidx.navigation.test.stringArgument
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -70,10 +71,7 @@ class NavGraphAndroidTest {
 
         graph.addDeepLink("www.example.com/users/index.html")
 
-        val idArgument = NavArgument.Builder()
-            .setType(NavType.StringType)
-            .build()
-        graph.addArgument("id", idArgument)
+        graph.addArgument("id", stringArgument("no-id"))
         graph.addDeepLink("www.example.com/users/{name}")
 
         val match = graph.matchDeepLink(
@@ -155,16 +153,10 @@ class NavGraphAndroidTest {
         val graph = navigatorProvider.getNavigator(NavGraphNavigator::class.java)
             .createDestination()
 
-        val codeArgument = NavArgument.Builder()
-            .setType(NavType.StringType)
-            .build()
-        graph.addArgument("code", codeArgument)
+        graph.addArgument("code", stringArgument("no-code"))
         graph.addDeepLink("www.example.com/users?code={code}")
 
-        val idArgument = NavArgument.Builder()
-            .setType(NavType.StringType)
-            .build()
-        graph.addArgument("id", idArgument)
+        graph.addArgument("id", stringArgument("no-id"))
         graph.addDeepLink("www.example.com/users?id={id}")
 
         val match = graph.matchDeepLink(

@@ -312,6 +312,14 @@ public open class NavDestination(
      * @see NavController.navigate
      */
     public fun addDeepLink(navDeepLink: NavDeepLink) {
+        val missingRequiredArguments = arguments.filterValues { !it.isDefaultValuePresent }
+            .keys
+            .filter { it !in navDeepLink.arguments }
+        require(missingRequiredArguments.isEmpty()) {
+            "Deep link ${navDeepLink.uriPattern} can't be used to open destination $this.\n" +
+                "Following required arguments are missing: $missingRequiredArguments"
+        }
+
         deepLinks.add(navDeepLink)
     }
 
