@@ -16,10 +16,8 @@
 
 package androidx.paging
 
-import androidx.paging.LoadState.NotLoading
 import androidx.paging.LoadType.APPEND
 import androidx.paging.LoadType.PREPEND
-import androidx.paging.LoadType.REFRESH
 import androidx.paging.PageEvent.Insert.Companion.Refresh
 import androidx.paging.PagePresenter.ProcessPageEventCallback
 import androidx.paging.PagingSource.LoadResult.Page.Companion.COUNT_UNDEFINED
@@ -320,7 +318,7 @@ class PagePresenterTest {
         )
 
         assertThat(callback.getAllAndClear()).isEqualTo(
-            events + listOf(StateEvent(APPEND, false, NotLoading.Incomplete))
+            events + listOf(StateEvent(CombinedLoadStates.IDLE_SOURCE))
         )
 
         // assert final list state
@@ -361,7 +359,7 @@ class PagePresenterTest {
         )
 
         assertThat(callback.getAllAndClear()).isEqualTo(
-            events + listOf(StateEvent(PREPEND, false, NotLoading.Incomplete))
+            events + listOf(StateEvent(CombinedLoadStates.IDLE_SOURCE))
         )
 
         // assert final list state
@@ -549,9 +547,7 @@ class PagePresenterTest {
 
     companion object {
         val IDLE_EVENTS = listOf<PresenterEvent>(
-            StateEvent(REFRESH, false, NotLoading.Incomplete),
-            StateEvent(PREPEND, false, NotLoading.Incomplete),
-            StateEvent(APPEND, false, NotLoading.Incomplete)
+            StateEvent(CombinedLoadStates.IDLE_SOURCE)
         )
     }
 }

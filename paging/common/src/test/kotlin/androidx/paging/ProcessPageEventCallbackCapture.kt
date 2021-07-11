@@ -23,9 +23,7 @@ data class ChangeEvent(val position: Int, val count: Int) : PresenterEvent()
 data class InsertEvent(val position: Int, val count: Int) : PresenterEvent()
 data class RemoveEvent(val position: Int, val count: Int) : PresenterEvent()
 data class StateEvent(
-    val loadType: LoadType,
-    val fromMediator: Boolean,
-    val loadState: LoadState
+    val combinedLoadStates: CombinedLoadStates
 ) : PresenterEvent()
 
 class ProcessPageEventCallbackCapture : ProcessPageEventCallback {
@@ -50,8 +48,8 @@ class ProcessPageEventCallbackCapture : ProcessPageEventCallback {
         }
     }
 
-    override fun onStateUpdate(loadType: LoadType, fromMediator: Boolean, loadState: LoadState) {
-        list.add(StateEvent(loadType, fromMediator, loadState))
+    override fun onStateUpdate(combinedLoadStates: CombinedLoadStates) {
+        list.add(StateEvent(combinedLoadStates))
     }
 }
 

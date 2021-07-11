@@ -188,25 +188,8 @@ internal sealed class PageEvent<T : Any> {
     }
 
     data class LoadStateUpdate<T : Any>(
-        val loadType: LoadType,
-        val fromMediator: Boolean,
-        val loadState: LoadState // TODO: consider using full state object here
+        val combinedLoadStates: CombinedLoadStates
     ) : PageEvent<T>() {
-        init {
-            // endOfPaginationReached for local refresh is driven by null values in next/prev keys.
-            require(
-                loadType != REFRESH || fromMediator || loadState !is LoadState.NotLoading ||
-                    !loadState.endOfPaginationReached
-            ) {
-                "LoadStateUpdate for local REFRESH may not set endOfPaginationReached = true"
-            }
-
-            require(canDispatchWithoutInsert(loadState, fromMediator)) {
-                "LoadStateUpdates cannot be used to dispatch NotLoading unless it is from remote" +
-                    " mediator and remote mediator reached end of pagination."
-            }
-        }
-
         companion object {
             /**
              * DataSource loads with no more to load must carry LoadState.NotLoading with them,
@@ -214,8 +197,29 @@ internal sealed class PageEvent<T : Any> {
              *
              * This prevents multiple related RV animations from happening simultaneously
              */
-            internal fun canDispatchWithoutInsert(loadState: LoadState, fromMediator: Boolean) =
-                loadState is LoadState.Loading || loadState is LoadState.Error || fromMediator
+            internal fun canDispatchWithoutInsert(
+                prevLoadStates: CombinedLoadStates,
+                loadStates: CombinedLoadStates
+            ): Boolean {
+                // If prev and current load states are the same can't dispatch without insert
+                if (prevLoadStates == loadStates) {
+                    return false
+                }
+
+                // Check which state changed, then check if the changed state would be able to
+                // be dispatched without an insert
+                var canDispatch = false
+                loadStates.forEach { loadType, fromMediator, loadState ->
+                    if (prevLoadStates.get(loadType, fromMediator) != loadState) {
+                        if (loadState is LoadState.Loading || loadState is LoadState.Error ||
+                            fromMediator
+                        ) {
+                            canDispatch = true
+                        }
+                    }
+                }
+                return canDispatch
+            }
         }
     }
 

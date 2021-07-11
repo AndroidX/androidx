@@ -94,6 +94,10 @@ public class CombinedLoadStates(
             "source=$source, mediator=$mediator)"
     }
 
+    internal fun get(loadType: LoadType, fromMediator: Boolean): LoadState? {
+        return if (fromMediator) mediator?.get(loadType) else source.get(loadType)
+    }
+
     internal fun forEach(op: (LoadType, Boolean, LoadState) -> Unit) {
         source.forEach { type, state ->
             op(type, false, state)

@@ -137,9 +137,9 @@ class PageEventTest {
     @Test
     fun stateTransform() = runBlockingTest {
         val state = LoadStateUpdate<Char>(
-            loadType = REFRESH,
-            fromMediator = false,
-            loadState = LoadState.Loading
+            localLoadStatesOf(
+                refreshLocal = LoadState.Loading
+            )
         )
 
         assertSame(state, state.map { it + 1 })

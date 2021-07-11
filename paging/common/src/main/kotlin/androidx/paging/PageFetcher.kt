@@ -130,19 +130,15 @@ internal class PageFetcher<Key : Any, Value : Any>(
         return simpleChannelFlow {
             val loadStates = MutableLoadStateCollection()
 
-            suspend fun dispatchIfValid(type: LoadType, state: LoadState) {
+            suspend fun dispatchIfValid(prevLoadStates: CombinedLoadStates) {
                 // not loading events are sent w/ insert-drop events.
                 if (PageEvent.LoadStateUpdate.canDispatchWithoutInsert(
-                        state,
-                        fromMediator = true
+                        prevLoadStates,
+                        loadStates.snapshot()
                     )
                 ) {
                     send(
-                        PageEvent.LoadStateUpdate<Value>(
-                            loadType = type,
-                            fromMediator = true,
-                            loadState = state
-                        )
+                        PageEvent.LoadStateUpdate(loadStates.snapshot())
                     )
                 } else {
                     // Wait for invalidation to set state to NotLoading via Insert to prevent any
@@ -153,18 +149,16 @@ internal class PageFetcher<Key : Any, Value : Any>(
             launch {
                 var prev = LoadStates.IDLE
                 accessor.state.collect {
-                    if (prev.refresh != it.refresh) {
+                    if (prev != it) {
+                        val prevCombinedLoadStates = loadStates.snapshot()
+
                         loadStates.set(REFRESH, true, it.refresh)
-                        dispatchIfValid(REFRESH, it.refresh)
-                    }
-                    if (prev.prepend != it.prepend) {
                         loadStates.set(PREPEND, true, it.prepend)
-                        dispatchIfValid(PREPEND, it.prepend)
-                    }
-                    if (prev.append != it.append) {
                         loadStates.set(APPEND, true, it.append)
-                        dispatchIfValid(APPEND, it.append)
+
+                        dispatchIfValid(prevCombinedLoadStates)
                     }
+
                     prev = it
                 }
             }
@@ -187,11 +181,22 @@ internal class PageFetcher<Key : Any, Value : Any>(
                     }
                     is PageEvent.LoadStateUpdate -> {
                         loadStates.set(
-                            type = event.loadType,
-                            remote = event.fromMediator,
-                            state = event.loadState
+                            REFRESH,
+                            false,
+                            event.combinedLoadStates.source.refresh
                         )
-                        send(event)
+                        loadStates.set(
+                            PREPEND,
+                            false,
+                            event.combinedLoadStates.source.prepend
+                        )
+                        loadStates.set(
+                            APPEND,
+                            false,
+                            event.combinedLoadStates.source.append
+                        )
+
+                        send(event.copy(combinedLoadStates = loadStates.snapshot()))
                     }
                 }
             }

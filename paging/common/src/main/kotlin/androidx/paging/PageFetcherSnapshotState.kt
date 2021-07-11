@@ -84,6 +84,15 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
             }
         }
 
+    val combinedLoadStates
+        get() = CombinedLoadStates(
+            refresh = sourceLoadStates.refresh,
+            prepend = sourceLoadStates.prepend,
+            append = sourceLoadStates.append,
+            source = sourceLoadStates,
+            mediator = null
+        )
+
     // Load generation ids used to respect cancellation in cases where suspending code continues to
     // run even after cancellation.
     private var prependGenerationId = 0
@@ -148,35 +157,17 @@ internal class PageFetcherSnapshotState<Key : Any, Value : Any> private construc
                 pages = pages,
                 placeholdersBefore = placeholdersBefore,
                 placeholdersAfter = placeholdersAfter,
-                combinedLoadStates = CombinedLoadStates(
-                    refresh = sourceLoadStates.refresh,
-                    prepend = sourceLoadStates.prepend,
-                    append = sourceLoadStates.append,
-                    source = sourceLoadStates,
-                    mediator = null,
-                )
+                combinedLoadStates = combinedLoadStates
             )
             PREPEND -> Prepend(
                 pages = pages,
                 placeholdersBefore = placeholdersBefore,
-                combinedLoadStates = CombinedLoadStates(
-                    refresh = sourceLoadStates.refresh,
-                    prepend = sourceLoadStates.prepend,
-                    append = sourceLoadStates.append,
-                    source = sourceLoadStates,
-                    mediator = null,
-                )
+                combinedLoadStates = combinedLoadStates
             )
             APPEND -> Append(
                 pages = pages,
                 placeholdersAfter = placeholdersAfter,
-                combinedLoadStates = CombinedLoadStates(
-                    refresh = sourceLoadStates.refresh,
-                    prepend = sourceLoadStates.prepend,
-                    append = sourceLoadStates.append,
-                    source = sourceLoadStates,
-                    mediator = null,
-                )
+                combinedLoadStates = combinedLoadStates
             )
         }
     }

@@ -511,12 +511,25 @@ private class SeparatorState<R : Any, T : R>(
     suspend fun onLoadStateUpdate(event: LoadStateUpdate<T>): PageEvent<R> {
         // Check for redundant LoadStateUpdate events to avoid unnecessary mapping to empty inserts
         // that might cause terminal separators to get added out of place.
-        if (loadStates.get(event.loadType, event.fromMediator) == event.loadState) {
+        if (loadStates.snapshot() == event.combinedLoadStates) {
             @Suppress("UNCHECKED_CAST")
             return event as PageEvent<R>
         }
 
-        loadStates.set(type = event.loadType, remote = event.fromMediator, state = event.loadState)
+        // Determine which LoadType has changed in the event from the current loadStates
+        var fromMediator = false
+        var diffType = REFRESH
+        var diffState: LoadState = NotLoading.Incomplete
+
+        event.combinedLoadStates.forEach { type, isRemote, state ->
+            if (loadStates.get(type, isRemote) != state) {
+                fromMediator = isRemote
+                diffType = type
+                diffState = state
+            }
+        }
+
+        loadStates.set(event.combinedLoadStates)
 
         // Transform terminal load state updates into empty inserts for header + footer support
         // when used with RemoteMediator. In cases where we defer adding a terminal separator,
@@ -524,20 +537,18 @@ private class SeparatorState<R : Any, T : R>(
         // isn't possible to add a separator to. Note: Adding a separate insert event also
         // doesn't work in the case where .insertSeparators() is called multiple times on the
         // same page event stream - we have to transform the terminating LoadStateUpdate event.
-        if (event.loadType != REFRESH && event.fromMediator &&
-            event.loadState.endOfPaginationReached
-        ) {
-            val emptyTerminalInsert: Insert<T> = if (event.loadType == PREPEND) {
+        if (diffType != REFRESH && fromMediator && diffState.endOfPaginationReached) {
+            val emptyTerminalInsert: Insert<T> = if (diffType == PREPEND) {
                 Insert.Prepend(
                     pages = emptyList(),
                     placeholdersBefore = placeholdersBefore,
-                    combinedLoadStates = loadStates.snapshot(),
+                    combinedLoadStates = loadStates.snapshot()
                 )
             } else {
                 Insert.Append(
                     pages = emptyList(),
                     placeholdersAfter = placeholdersAfter,
-                    combinedLoadStates = loadStates.snapshot(),
+                    combinedLoadStates = loadStates.snapshot()
                 )
             }
 

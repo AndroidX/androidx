@@ -18,7 +18,6 @@ package androidx.paging
 
 import androidx.paging.LoadState.Loading
 import androidx.paging.LoadType.APPEND
-import androidx.paging.LoadType.REFRESH
 import androidx.paging.PageEvent.LoadStateUpdate
 import androidx.paging.RemoteMediator.InitializeAction.LAUNCH_INITIAL_REFRESH
 import androidx.paging.RemoteMediator.InitializeAction.SKIP_INITIAL_REFRESH
@@ -420,7 +419,11 @@ class PageFetcherTest {
             advanceUntilIdle()
             assertThat(fetcherState.newEvents()).isEqualTo(
                 listOf<PageEvent<Int>>(
-                    LoadStateUpdate(REFRESH, false, Loading),
+                    LoadStateUpdate(
+                        localLoadStatesOf(
+                            refreshLocal = Loading
+                        )
+                    ),
                     createRefresh(range = 50..51)
                 )
             )
@@ -443,7 +446,11 @@ class PageFetcherTest {
             assertEquals(2, fetcherState.pageEventLists[0].size)
             assertThat(fetcherState.newEvents()).isEqualTo(
                 listOf<PageEvent<Int>>(
-                    LoadStateUpdate(REFRESH, false, Loading),
+                    LoadStateUpdate(
+                        localLoadStatesOf(
+                            refreshLocal = Loading
+                        )
+                    ),
                     createRefresh(range = 50..51)
                 )
             )
@@ -466,7 +473,11 @@ class PageFetcherTest {
             assertEquals(2, fetcherState.pageEventLists[1].size)
             assertThat(fetcherState.newEvents()).isEqualTo(
                 listOf<PageEvent<Int>>(
-                    LoadStateUpdate(REFRESH, false, Loading),
+                    LoadStateUpdate(
+                        localLoadStatesOf(
+                            refreshLocal = Loading
+                        )
+                    ),
                     createRefresh(range = 50..51)
                 )
             )
