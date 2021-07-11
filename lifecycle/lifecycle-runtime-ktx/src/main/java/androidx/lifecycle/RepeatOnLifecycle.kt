@@ -43,7 +43,8 @@ import kotlin.coroutines.resume
  *         lifecycleScope.launch {
  *             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
  *                 uiStateFlow.collect { uiState ->
- *                 updateUi(uiState)
+ *                     updateUi(uiState)
+ *                 }
  *             }
  *         }
  *     }
@@ -147,7 +148,8 @@ public suspend fun Lifecycle.repeatOnLifecycle(
  *         lifecycleScope.launch {
  *             repeatOnLifecycle(Lifecycle.State.STARTED) {
  *                 uiStateFlow.collect { uiState ->
- *                 updateUi(uiState)
+ *                     updateUi(uiState)
+ *                 }
  *             }
  *         }
  *     }
